@@ -25,6 +25,8 @@ function generateInvoicePdfBuffer(order = {}, idDisplay = '') {
       const delDate = [b.deliveryDate, b.deliveryTime].filter(Boolean).join(' ') || new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
       const statusLabel = String(order.status || 'Delivered').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
       const paymentMethod = order.paymentMethod || b.paymentMethod || 'Card on Delivery';
+      const pStatus = String(order.paymentStatus || b.paymentStatus || '').toLowerCase();
+      const isPaid = pStatus === 'paid' || pStatus === 'paid_on_delivery' || String(paymentMethod).toLowerCase() === 'paid';
       const dateStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
       // Top Navy Brand Bar
@@ -135,10 +137,19 @@ function generateInvoicePdfBuffer(order = {}, idDisplay = '') {
 
       y += 12;
       doc.font('Helvetica').fontSize(9).fillColor('#6B7280').text('Payment', 48, y);
-      doc.font('Helvetica-Bold').fontSize(10).fillColor('#111827').text(paymentMethod, 48, y + 15);
-      doc.font('Helvetica').fontSize(9.5).fillColor('#374151')
-        .text('Pay online with SumUp:', 48, y + 36)
-        .fillColor('#0B2A6B').text('https://pay.sumup.com/b2c/Q3MO3NEP', 48, y + 50);
+      doc.font('Helvetica-Bold').fontSize(10).fillColor('#111827').text(isPaid ? `${paymentMethod} · Paid in full` : paymentMethod, 48, y + 15);
+      if (isPaid) {
+        doc.save();
+        doc.rotate(-10, { origin: [235, y + 40] });
+        doc.roundedRect(188, y + 24, 94, 34, 6).fillAndStroke('#ECFDF5', '#059669');
+        doc.lineWidth(2).roundedRect(188, y + 24, 94, 34, 6).stroke('#059669');
+        doc.font('Helvetica-Bold').fontSize(17).fillColor('#059669').text('PAID', 188, y + 33, { width: 94, align: 'center' });
+        doc.restore();
+      } else {
+        doc.font('Helvetica').fontSize(9.5).fillColor('#374151')
+          .text('Pay online with SumUp:', 48, y + 36)
+          .fillColor('#0B2A6B').text('https://pay.sumup.com/b2c/Q3MO3NEP', 48, y + 50);
+      }
 
       let sy = y;
       doc.font('Helvetica').fontSize(10).fillColor('#6B7280').text('Subtotal', 328, sy, { width: 120 });

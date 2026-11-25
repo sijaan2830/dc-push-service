@@ -93,6 +93,8 @@ function buildDeliveredHtml(order = {}, id = '') {
   const todayStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const deliveryDate = formatDateValue(order.deliveredAt, b.deliveryDate || todayStr);
   const paymentMethod = order.paymentMethod || b.paymentMethod || 'Card on Delivery';
+  const pStatus = String(order.paymentStatus || b.paymentStatus || '').toLowerCase();
+  const isPaid = pStatus === 'paid' || pStatus === 'paid_on_delivery' || String(paymentMethod).toLowerCase() === 'paid';
 
   const items = parseLineItems(order);
   const itemsSum = items.reduce((sum, i) => sum + i.totalNum, 0);
@@ -142,6 +144,7 @@ function buildDeliveredHtml(order = {}, id = '') {
                   <td align="left" valign="middle">${buildSignatureLogoHtml()}</td>
                   <td align="right" valign="middle" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #6B7280;">
                     Receipt<br><span style="font-size: 14px; font-weight: bold; color: #111827;">INV-${id}</span>
+                    ${isPaid ? '<div style="margin-top:6px;"><span style="display:inline-block;padding:3px 10px;background-color:#ECFDF5;color:#059669;border:1.5px solid #059669;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:1.2px;">PAID</span></div>' : ''}
                   </td>
                 </tr>
               </table>
@@ -163,7 +166,7 @@ function buildDeliveredHtml(order = {}, id = '') {
                 </tr>
                 <tr>
                   <td class="stack" valign="top" width="50%" style="padding: 12px 16px 18px 0;"><div style="font-size: 12px; color: #6B7280;">Delivered to</div><div style="font-size: 14px; color: #111827;">${address}</div></td>
-                  <td class="stack" valign="top" width="50%" style="padding: 12px 0 18px;"><div style="font-size: 12px; color: #6B7280;">Payment</div><div style="font-size: 14px; color: #111827;">${paymentMethod}</div><div style="font-size: 14px; font-weight: bold; color: #1A7F5A;">Paid in full</div></td>
+                  <td class="stack" valign="top" width="50%" style="padding: 12px 0 18px;"><div style="font-size: 12px; color: #6B7280;">Payment</div><div style="font-size: 14px; color: #111827;">${paymentMethod}</div><div style="font-size: 14px; font-weight: bold; color: ${isPaid ? '#1A7F5A' : '#D97706'};">${isPaid ? 'Paid in full' : 'Payment pending'}</div></td>
                 </tr>
               </table>
             </td>
