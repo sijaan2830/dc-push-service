@@ -88,25 +88,25 @@ function buildFooterHtml(unsubscribeUrl = '') {
               </div>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
                 <tr>
-                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 13px;">
-                    <a href="${APP_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
+                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 7px 11px; white-space: nowrap;">
+                    <a href="${APP_STORE_URL}" style="text-decoration: none; color: #111827; display: block; white-space: nowrap;">
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/apple-badge.png" width="24" height="24" alt="Apple" style="display: block; border: 0; border-radius: 5px;"></td>
-                        <td valign="middle">
-                          <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">Download on the</div>
-                          <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">App Store</div>
+                        <td valign="middle" style="padding-right: 7px;"><img src="${ASSETS_BASE}/apple-badge.png" width="22" height="22" alt="Apple" style="display: block; border: 0; border-radius: 5px;"></td>
+                        <td valign="middle" style="white-space: nowrap;">
+                          <div style="font-size: 8.5px; line-height: 1.1; color: #4B5563; white-space: nowrap;">Download on the</div>
+                          <div style="font-size: 12.5px; font-weight: 800; line-height: 1.2; color: #111827; white-space: nowrap;">App Store</div>
                         </td>
                       </tr></table>
                     </a>
                   </td>
-                  <td width="10">&nbsp;</td>
-                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 13px;">
-                    <a href="${PLAY_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
+                  <td width="8">&nbsp;</td>
+                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 7px 11px; white-space: nowrap;">
+                    <a href="${PLAY_STORE_URL}" style="text-decoration: none; color: #111827; display: block; white-space: nowrap;">
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/play-icon.png" width="24" height="24" alt="Google Play" style="display: block; border: 0;"></td>
-                        <td valign="middle">
-                          <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">GET IT ON</div>
-                          <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">Google Play</div>
+                        <td valign="middle" style="padding-right: 7px;"><img src="${ASSETS_BASE}/play-icon.png" width="22" height="22" alt="Google Play" style="display: block; border: 0;"></td>
+                        <td valign="middle" style="white-space: nowrap;">
+                          <div style="font-size: 8.5px; line-height: 1.1; color: #4B5563; white-space: nowrap;">GET IT ON</div>
+                          <div style="font-size: 12.5px; font-weight: 800; line-height: 1.2; color: #111827; white-space: nowrap;">Google Play</div>
                         </td>
                       </tr></table>
                     </a>
