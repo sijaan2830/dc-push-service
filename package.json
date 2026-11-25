@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "express": "^4.21.0",
-    "firebase-admin": "^13.0.0"
+    "firebase-admin": "^13.0.0",
+    "pdfkit": "^0.21.0"
   },
   "engines": {
     "node": ">=18"
