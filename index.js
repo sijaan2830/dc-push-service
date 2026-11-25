@@ -1,6 +1,7 @@
 const express = require('express');
 const admin = require('firebase-admin');
 const { generateInvoicePdfBuffer } = require('./invoice_pdf');
+const { buildDeliveredHtml, buildApprovalHtml, buildConfirmationHtml } = require('./email_templates');
 
 // ── Firebase Admin SDK init ─────────────────────────────────────
 const credJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
@@ -99,58 +100,6 @@ app.post('/api/send-push', auth, async (req, res) => {
 // ── POST /api/send-email ────────────────────────────────────────
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'DryClean Plus <orders@drycleanplus.co.uk>';
 const REPLY_TO = 'dilee@drycleanplus.co.uk';
-const money = (n) => `£${Number(n || 0).toFixed(2)}`;
-
-function parseEmailItems(order = {}) {
-  const b = order.bookingData || {};
-  const raw = order.countedItems || order.items || order.lines || b.selectedItems || {};
-  const arr = Array.isArray(raw) ? raw : (raw && typeof raw === 'object' ? Object.values(raw) : []);
-  return arr.map((it) => {
-    const qty = Number(it.quantity || it.qty || 1);
-    const unit = Number(it.unitPrice ?? it.numericPrice ?? String(it.price || 0).replace(/[^0-9.]/g, '')) || 0;
-    const total = Number(it.total ?? it.rowTotal ?? (unit * qty)) || 0;
-    return { name: it.itemType || it.name || 'Garment', qty, total };
-  });
-}
-
-function buildEmailHtml(type, order = {}, id) {
-  const b = order.bookingData || {};
-  const name = [b.firstName, b.lastName].filter(Boolean).join(' ').trim() || order.customerName || 'Valued Customer';
-  const items = parseEmailItems(order);
-  const pricing = order.pricing || {};
-  const totalNum = Number(pricing.final ?? order.transactionAmount ?? b.totalPrice ?? 0) || items.reduce((s, i) => s + i.total, 0);
-  const rowsHtml = items.length
-    ? items.map((i) => `<tr><td style="padding:8px 0;border-bottom:1px solid #E5E7EB;">${i.qty}x ${i.name}</td><td style="padding:8px 0;border-bottom:1px solid #E5E7EB;text-align:right;font-weight:bold;">${money(i.total)}</td></tr>`).join('')
-    : '<tr><td style="padding:8px 0;color:#6B7280;">Standard laundry & dry cleaning service</td><td style="padding:8px 0;text-align:right;font-weight:bold;">' + money(totalNum) + '</td></tr>';
-  const heading = type === 'awaiting_approval'
-    ? 'Please approve your updated bill'
-    : type === 'delivered'
-      ? 'Your order has been delivered'
-      : 'Your DryClean Plus booking is confirmed';
-  const intro = type === 'awaiting_approval'
-    ? `We have checked and itemised your garments for order <b>#${id}</b>. Please open the DryClean Plus app to review and approve your total.`
-    : type === 'delivered'
-      ? `Your clean clothes for order <b>#${id}</b> have been delivered. Your official PDF receipt &amp; invoice is attached.`
-      : `Thank you for your order <b>#${id}</b>. We will collect your garments in your chosen slot.`;
-
-  return `<!DOCTYPE html><html><body style="margin:0;padding:24px;background:#F5F7FA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#111827;">
-    <div style="max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:14px;overflow:hidden;border:1px solid #E5E7EB;">
-      <div style="background:#0B2A6B;padding:22px 28px;color:#FFFFFF;font-size:20px;font-weight:700;">Dryclean <span style="color:#FFD25E;">Plus+</span></div>
-      <div style="padding:28px;">
-        <h2 style="margin:0 0 12px;font-size:20px;color:#0B2A6B;">${heading}</h2>
-        <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#374151;">Hi ${name},</p>
-        <p style="margin:0 0 20px;font-size:14px;line-height:1.6;color:#374151;">${intro}</p>
-        <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:16px;">${rowsHtml}
-          <tr><td style="padding:12px 0 0;font-weight:700;font-size:16px;">Total</td><td style="padding:12px 0 0;text-align:right;font-weight:700;font-size:16px;color:#0B2A6B;">${money(totalNum)}</td></tr>
-        </table>
-        <p style="margin:18px 0 0;font-size:13px;color:#6B7280;">Questions? Reply to this email or call +44 7424 866802.</p>
-      </div>
-      <div style="padding:18px 28px;background:#F9FAFB;border-top:1px solid #E5E7EB;font-size:12px;color:#6B7280;">
-        <b>DryClean Plus Ltd</b> · 2c Bar Gate, Newark NG24 1ES, United Kingdom<br>
-        dilee@drycleanplus.co.uk · www.drycleanplus.co.uk
-      </div>
-    </div></body></html>`;
-}
 
 app.post('/api/send-email', auth, async (req, res) => {
   try {
@@ -169,7 +118,11 @@ app.post('/api/send-email', auth, async (req, res) => {
       : type === 'delivered'
         ? `Your DryClean Plus receipt, order #${id}`
         : `Booking confirmed, order #${id}`;
-    const html = buildEmailHtml(type, order, id);
+    const html = type === 'awaiting_approval'
+      ? buildApprovalHtml(order, id)
+      : type === 'delivered'
+        ? buildDeliveredHtml(order, id)
+        : buildConfirmationHtml(order, id);
 
     const attachments = [];
     if (type === 'delivered' || type === 'awaiting_approval') {
