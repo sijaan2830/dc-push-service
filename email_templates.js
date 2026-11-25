@@ -443,4 +443,95 @@ function buildConfirmationHtml(order = {}, id = '') {
 </html>`;
 }
 
-module.exports = { buildDeliveredHtml, buildApprovalHtml, buildConfirmationHtml };
+function buildPromoHtml({
+  firstName = 'there',
+  headline = '',
+  body1 = '',
+  body2 = '',
+  promoCode = '',
+  ctaText = 'GET 20% OFF MY FIRST ORDER',
+  ctaUrl = SITE_URL,
+  unsubscribeUrl = `${SITE_URL}`,
+} = {}) {
+  const safeName = String(firstName || 'there').trim() || 'there';
+  const finalHeadline = (headline || `${safeName}, your first DryClean Plus order is 20% off.`).replace(/\{firstName\}/gi, safeName);
+  const code = String(promoCode || '').trim();
+  const p1 = body1 || 'You have better things to do than sorting, washing and folding. Let us take care of your laundry and dry cleaning with doorstep collection and delivery.';
+  const p2 = (body2 || (code
+    ? `Here's how it works: pick a time that suits you, we collect your laundry or dry cleaning from your home or office, and it comes back clean to your door, with free delivery. Add code <b>${code}</b> at checkout to get <b>20% off your first order</b>.`
+    : 'Here\'s how it works: pick a time that suits you, we collect your laundry or dry cleaning from your home or office, and it comes back clean to your door, with free delivery.')).replace(/\{code\}/gi, code ? `<b>${code}</b>` : '');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <title>${finalHeadline}</title>
+  <style>
+    @media only screen and (max-width: 600px) {
+      .outer-pad { padding: 0 !important; }
+      .px { padding-left: 16px !important; padding-right: 16px !important; }
+      .h1 { font-size: 28px !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #FFFFFF; -webkit-text-size-adjust: 100%;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="background-color: #FFFFFF;">
+    <tr>
+      <td class="outer-pad" align="center" style="padding: 12px 0;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="width: 100%; max-width: 600px; background-color: #FFFFFF;">
+          <tr>
+            <td height="6" bgcolor="#0077FF" style="height: 6px; font-size: 0; line-height: 0; background-color: #0077FF;">&nbsp;</td>
+          </tr>
+          <tr>
+            <td class="px" bgcolor="#FFFFFF" style="padding: 16px 20px 14px; background-color: #FFFFFF; border-bottom: 1px solid #EEF2F6;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="left" valign="middle">
+                    ${buildSignatureLogoHtml()}
+                  </td>
+                  <td align="right" valign="middle" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 13px;">
+                    <a href="${unsubscribeUrl}" style="color: #0077FF; text-decoration: none; font-weight: 500;">Unsubscribe</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="px" bgcolor="#FFFFFF" style="padding: 26px 28px 32px; background-color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827;">
+              <h1 class="h1" style="margin: 0 0 22px; font-size: 31px; line-height: 1.18; font-weight: 800; letter-spacing: -0.6px; color: #18181B;">${finalHeadline}</h1>
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.65; color: #27272A;">${p1}</p>
+              <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.65; color: #27272A;">${p2}</p>
+              <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.65; color: #27272A;">No trips to the dry cleaner and no waiting around. Book in the DryClean Plus app or online and get your time back. Less laundry, more life!</p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" bgcolor="#F9CA56" style="background-color: #F9CA56; border-radius: 6px;">
+                    <a href="${ctaUrl}" style="display: block; padding: 16px 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.5px; color: #111827; text-decoration: none; text-transform: uppercase;">${ctaText}</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="px" bgcolor="#FFFFFF" style="padding: 18px 28px 24px; background-color: #FFFFFF; border-top: 1px solid #EEF2F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.65; color: #6B7280;">
+              <div style="font-weight: 600; color: #374151;">DryClean Plus Ltd</div>
+              <div>2c Bar Gate, Newark NG24 1ES, United Kingdom · dilee@drycleanplus.co.uk · ${SUPPORT_PHONE}</div>
+              <div style="padding-top: 6px;">
+                <a href="${SITE_URL}" style="color: #0077FF; text-decoration: underline;">drycleanplus.co.uk</a> ·
+                <a href="${unsubscribeUrl}" style="color: #6B7280; text-decoration: underline;">Unsubscribe</a>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
+module.exports = { buildDeliveredHtml, buildApprovalHtml, buildConfirmationHtml, buildPromoHtml };
