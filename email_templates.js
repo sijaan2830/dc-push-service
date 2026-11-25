@@ -71,16 +71,41 @@ function buildSignatureLogoHtml() {
                     </a>`;
 }
 
-function buildFooterHtml() {
+const APP_STORE_URL = 'https://apps.apple.com/app/id6797293315';
+const PLAY_STORE_URL = 'https://drycleanplus.co.uk';
+
+function buildFooterHtml(unsubscribeUrl = '') {
+  const year = new Date().getFullYear();
   return `
           <tr>
-            <td class="px" bgcolor="#FFFFFF" style="padding: 26px 40px 28px; background-color: #FFFFFF; border-top: 1px solid #E3E6EB; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.7; color: #6B7280;">
-              <div style="font-weight: bold; color: #374151;">DryClean Plus Ltd</div>
-              <div>2c Bar Gate, Newark NG24 1ES, United Kingdom · dilee@drycleanplus.co.uk · ${SUPPORT_PHONE}</div>
-              <div style="padding-top: 4px;">
-                <a href="${SITE_URL}" style="color: #0B2A6B; text-decoration: underline;">drycleanplus.co.uk</a>
+            <td bgcolor="#0077FF" style="padding: 26px 28px 28px; background-color: #0077FF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #FFFFFF;">
+              <div style="margin-bottom: 18px;">
+                <a href="${SITE_URL}" style="text-decoration: none; display: inline-block; white-space: nowrap;">
+                  <span style="font-family: 'Satisfy', 'Brush Script MT', cursive, Georgia, serif; font-size: 24px; font-weight: bold; font-style: italic; color: #FFFFFF;">Dryclean</span><span style="font-family: 'Satisfy', 'Brush Script MT', cursive, Georgia, serif; font-size: 24px; font-weight: bold; font-style: italic; color: #FFD25E; margin-left: 4px;">Plus+</span><span style="color: #FFD25E; font-size: 13px; margin-left: 4px;">&#10022;</span>
+                </a>
               </div>
-              <div style="padding-top: 10px;">You’re receiving this email because you placed an order with DryClean Plus.</div>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
+                <tr>
+                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 14px;">
+                    <a href="${APP_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
+                      <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">Download on the</div>
+                      <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">App Store</div>
+                    </a>
+                  </td>
+                  <td width="10">&nbsp;</td>
+                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 14px;">
+                    <a href="${PLAY_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
+                      <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">GET IT ON</div>
+                      <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">Google Play</div>
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <div style="font-size: 13.5px; font-weight: 700; color: #FFFFFF; margin-bottom: 12px;">DryClean Plus Ltd &copy; ${year}</div>
+              <div style="font-size: 12.5px; line-height: 1.65; color: #E0F2FE;">
+                2c Bar Gate, Newark NG24 1ES, United Kingdom · <a href="mailto:dilee@drycleanplus.co.uk" style="color: #FFFFFF; text-decoration: underline;">dilee@drycleanplus.co.uk</a> · ${SUPPORT_PHONE}<br>
+                You&rsquo;re receiving this email from DryClean Plus.${unsubscribeUrl ? ` If you no longer wish to receive promotional emails, you can <a href="${unsubscribeUrl}" style="color: #FFFFFF; font-weight: 700; text-decoration: underline;">unsubscribe here</a>.` : ''} Reach us anytime at <a href="${SITE_URL}" style="color: #FFFFFF; font-weight: 700; text-decoration: underline;">drycleanplus.co.uk</a>.
+              </div>
             </td>
           </tr>`;
 }
@@ -525,16 +550,7 @@ function buildPromoHtml({
               </table>
             </td>
           </tr>
-          <tr>
-            <td class="px" bgcolor="#FFFFFF" style="padding: 18px 28px 24px; background-color: #FFFFFF; border-top: 1px solid #EEF2F6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.65; color: #6B7280;">
-              <div style="font-weight: 600; color: #374151;">DryClean Plus Ltd</div>
-              <div>2c Bar Gate, Newark NG24 1ES, United Kingdom · dilee@drycleanplus.co.uk · ${SUPPORT_PHONE}</div>
-              <div style="padding-top: 6px;">
-                <a href="${SITE_URL}" style="color: #0077FF; text-decoration: underline;">drycleanplus.co.uk</a> ·
-                <a href="${unsubscribeUrl}" style="color: #6B7280; text-decoration: underline;">Unsubscribe</a>
-              </div>
-            </td>
-          </tr>
+          ${buildFooterHtml(unsubscribeUrl)}
         </table>
       </td>
     </tr>
