@@ -89,7 +89,7 @@ function buildDeliveredHtml(order = {}, id = '') {
   const b = order.bookingData || {};
   const customerName = formatCustomerName(order);
   const address = formatAddress(order);
-  const trackUrl = `${SITE_URL}/track/${encodeURIComponent(id)}`;
+  const trackUrl = `${SITE_URL}/?track=${encodeURIComponent(id)}`;
   const todayStr = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   const deliveryDate = formatDateValue(order.deliveredAt, b.deliveryDate || todayStr);
   const paymentMethod = order.paymentMethod || b.paymentMethod || 'Card on Delivery';
@@ -223,7 +223,7 @@ function buildApprovalHtml(order = {}, id = '') {
   const b = order.bookingData || {};
   const customerName = formatCustomerName(order);
   const address = formatAddress(order);
-  const trackUrl = `${SITE_URL}/track/${encodeURIComponent(id)}`;
+  const trackUrl = `${SITE_URL}/?track=${encodeURIComponent(id)}`;
 
   const items = parseLineItems(order);
   const itemsSum = items.reduce((sum, i) => sum + i.totalNum, 0);
@@ -353,7 +353,7 @@ function buildConfirmationHtml(order = {}, id = '') {
   const b = order.bookingData || {};
   const customerName = formatCustomerName(order);
   const address = formatAddress(order);
-  const trackUrl = `${SITE_URL}/track/${encodeURIComponent(id)}`;
+  const trackUrl = `${SITE_URL}/?track=${encodeURIComponent(id)}`;
   const collectionSlot = [b.collectionDate || 'Pending', b.collectionTime].filter(Boolean).join(', ');
   const deliverySlot = [b.deliveryDate || '24–48 hours', b.deliveryTime].filter(Boolean).join(', ');
 
