@@ -36,16 +36,17 @@ function auth(req, res, next) {
 }
 
 // ── POST /api/send-push ─────────────────────────────────────────
-// Body: { userId, title, body?, data? }
+// Body: { userId, title, body?, data?, collection? }
 app.post('/api/send-push', auth, async (req, res) => {
   try {
-    const { userId, title, body, data } = req.body;
+    const { userId, title, body, data, collection } = req.body;
     if (!userId || !title) {
       return res.status(400).json({ error: 'userId and title required' });
     }
 
-    // Read the user's FCM token from Firestore
-    const userDoc = await db.collection('users').doc(userId).get();
+    const col = collection === 'drivers' ? 'drivers' : 'users';
+    // Read the recipient's FCM token from Firestore
+    const userDoc = await db.collection(col).doc(userId).get();
     const ud = userDoc.data();
     if (!ud || !ud.fcmToken) {
       return res.json({ sent: false, reason: 'no_token' });
