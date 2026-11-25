@@ -80,10 +80,10 @@ function buildFooterHtml(unsubscribeUrl = '') {
   const year = new Date().getFullYear();
   return `
           <tr>
-            <td bgcolor="#0077FF" style="padding: 26px 28px 28px; background-color: #0077FF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #FFFFFF;">
+            <td bgcolor="#0084FF" style="padding: 26px 24px 28px; background-color: #0084FF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #FFFFFF;">
               <div style="margin-bottom: 18px;">
-                <a href="${SITE_URL}" style="text-decoration: none; display: inline-block; white-space: nowrap;">
-                  <span style="font-family: 'Satisfy', 'Brush Script MT', cursive, Georgia, serif; font-size: 24px; font-weight: bold; font-style: italic; color: #FFFFFF;">Dryclean</span><span style="font-family: 'Satisfy', 'Brush Script MT', cursive, Georgia, serif; font-size: 24px; font-weight: bold; font-style: italic; color: #FFD25E; margin-left: 4px;">Plus+</span><span style="color: #FFD25E; font-size: 13px; margin-left: 4px;">&#10022;</span>
+                <a href="${SITE_URL}" style="text-decoration: none; display: inline-block; background-color: #FFFFFF; padding: 7px 14px; border-radius: 8px; white-space: nowrap;">
+                  <span style="font-family: 'Satisfy', 'Brush Script MT', 'Segoe Script', cursive, Georgia, serif; font-size: 22px; font-weight: bold; font-style: italic; color: #1B5E20; letter-spacing: 0.2px;">Dryclean</span><span style="font-family: 'Satisfy', 'Brush Script MT', 'Segoe Script', cursive, Georgia, serif; font-size: 22px; font-weight: bold; font-style: italic; color: #EF4444; margin-left: 3px;">Plus</span><span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; font-size: 17px; font-weight: 900; color: #EF4444; margin-left: 2px;">+</span><span style="color: #FACC15; font-size: 13px; margin-left: 4px; vertical-align: middle;">&#10022;</span>
                 </a>
               </div>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
@@ -91,7 +91,7 @@ function buildFooterHtml(unsubscribeUrl = '') {
                   <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 13px;">
                     <a href="${APP_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/apple-icon.png" width="22" height="22" alt="Apple" style="display: block; border: 0;"></td>
+                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/apple-badge.png" width="24" height="24" alt="Apple" style="display: block; border: 0; border-radius: 5px;"></td>
                         <td valign="middle">
                           <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">Download on the</div>
                           <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">App Store</div>
@@ -103,7 +103,7 @@ function buildFooterHtml(unsubscribeUrl = '') {
                   <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 13px;">
                     <a href="${PLAY_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
                       <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/play-icon.png" width="22" height="22" alt="Google Play" style="display: block; border: 0;"></td>
+                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/play-icon.png" width="24" height="24" alt="Google Play" style="display: block; border: 0;"></td>
                         <td valign="middle">
                           <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">GET IT ON</div>
                           <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">Google Play</div>
