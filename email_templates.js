@@ -454,7 +454,12 @@ function buildPromoHtml({
   unsubscribeUrl = `${SITE_URL}`,
 } = {}) {
   const safeName = String(firstName || 'there').trim() || 'there';
-  const finalHeadline = (headline || `${safeName}, your first DryClean Plus order is 20% off.`).replace(/\{firstName\}/gi, safeName);
+  const rawHeadline = (headline || `${safeName}, your first DryClean Plus order is 20% off.`).replace(/\{firstName\}/gi, safeName);
+  const hasNameInHeadline = safeName !== 'there' && rawHeadline.toLowerCase().includes(safeName.toLowerCase());
+  const greetingHtml = !hasNameInHeadline && safeName !== 'there'
+    ? `<div style="margin: 0 0 8px; font-size: 15px; font-weight: 700; color: #0B2A6B;">Hi ${safeName},</div>`
+    : '';
+  const finalHeadline = rawHeadline;
   const code = String(promoCode || '').trim();
   const p1 = body1 || 'You have better things to do than sorting, washing and folding. Let us take care of your laundry and dry cleaning with doorstep collection and delivery.';
   const p2 = (body2 || (code
@@ -503,6 +508,7 @@ function buildPromoHtml({
           </tr>
           <tr>
             <td class="px" bgcolor="#FFFFFF" style="padding: 26px 28px 32px; background-color: #FFFFFF; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827;">
+              ${greetingHtml}
               <h1 class="h1" style="margin: 0 0 22px; font-size: 31px; line-height: 1.18; font-weight: 800; letter-spacing: -0.6px; color: #18181B;">${finalHeadline}</h1>
               <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.65; color: #27272A;">${p1}</p>
               <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.65; color: #27272A;">${p2}</p>
