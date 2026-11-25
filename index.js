@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const admin = require('firebase-admin');
 const { generateInvoicePdfBuffer } = require('./invoice_pdf');
 const { buildDeliveredHtml, buildApprovalHtml, buildConfirmationHtml, buildPromoHtml } = require('./email_templates');
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
+app.use('/assets', express.static(path.join(__dirname, 'public')));
 
 // ── Simple API-key auth ─────────────────────────────────────────
 const API_KEY = process.env.PUSH_API_KEY || '';

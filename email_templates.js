@@ -74,6 +74,8 @@ function buildSignatureLogoHtml() {
 const APP_STORE_URL = 'https://apps.apple.com/app/id6797293315';
 const PLAY_STORE_URL = 'https://drycleanplus.co.uk';
 
+const ASSETS_BASE = 'https://dc-push-service.onrender.com/assets';
+
 function buildFooterHtml(unsubscribeUrl = '') {
   const year = new Date().getFullYear();
   return `
@@ -86,17 +88,27 @@ function buildFooterHtml(unsubscribeUrl = '') {
               </div>
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 20px;">
                 <tr>
-                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 14px;">
+                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 13px;">
                     <a href="${APP_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
-                      <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">Download on the</div>
-                      <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">App Store</div>
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/apple-icon.png" width="22" height="22" alt="Apple" style="display: block; border: 0;"></td>
+                        <td valign="middle">
+                          <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">Download on the</div>
+                          <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">App Store</div>
+                        </td>
+                      </tr></table>
                     </a>
                   </td>
                   <td width="10">&nbsp;</td>
-                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 14px;">
+                  <td bgcolor="#FFFFFF" style="background-color: #FFFFFF; border-radius: 8px; padding: 8px 13px;">
                     <a href="${PLAY_STORE_URL}" style="text-decoration: none; color: #111827; display: block;">
-                      <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">GET IT ON</div>
-                      <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">Google Play</div>
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                        <td valign="middle" style="padding-right: 8px;"><img src="${ASSETS_BASE}/play-icon.png" width="22" height="22" alt="Google Play" style="display: block; border: 0;"></td>
+                        <td valign="middle">
+                          <div style="font-size: 9px; line-height: 1.1; color: #4B5563;">GET IT ON</div>
+                          <div style="font-size: 13.5px; font-weight: 800; line-height: 1.25; color: #111827;">Google Play</div>
+                        </td>
+                      </tr></table>
                     </a>
                   </td>
                 </tr>
@@ -548,6 +560,9 @@ function buildPromoHtml({
                   </td>
                 </tr>
               </table>
+              <img src="${ASSETS_BASE}/promo-hero.png" alt="DryClean Plus laundry and dry cleaning" width="100%" style="display: block; width: 100%; height: auto; border-radius: 6px; margin: 26px 0 22px; border: 0;">
+              <h2 style="margin: 0 0 12px; font-size: 28px; line-height: 1.18; font-weight: 800; letter-spacing: -0.4px; color: #18181B;">Ready to try it, ${safeName}?</h2>
+              <p style="margin: 0; font-size: 12.5px; line-height: 1.6; color: #6B7280;">*Terms and conditions apply.${code ? ` Ensure code <b>${code}</b> is applied at checkout.` : ''} Turnaround times vary by service and area. Please refer to the app or website for full details.</p>
             </td>
           </tr>
           ${buildFooterHtml(unsubscribeUrl)}
