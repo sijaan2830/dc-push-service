@@ -211,8 +211,12 @@ app.post('/api/send-promo', auth, async (req, res) => {
     let sent = 0;
     let failed = 0;
     const errors = [];
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    for (const r of recipients) {
+    for (let i = 0; i < recipients.length; i++) {
+      const r = recipients[i];
+      if (i > 0) await sleep(600); // Stay cleanly under Resend's 2 req/sec limit
+
       const unsubUrl = `${basePublicUrl}/api/unsubscribe?uid=${encodeURIComponent(r.uid)}&email=${encodeURIComponent(r.email)}`;
       const personalSubject = String(subject)
         .replace(/\{firstName\}/gi, r.firstName)
@@ -228,22 +232,35 @@ app.post('/api/send-promo', auth, async (req, res) => {
         unsubscribeUrl: unsubUrl,
       });
 
+      const payload = JSON.stringify({
+        from: FROM_EMAIL,
+        to: [r.email],
+        reply_to: REPLY_TO,
+        subject: personalSubject,
+        html,
+        headers: { 'List-Unsubscribe': `<${unsubUrl}>` },
+      });
+
       try {
-        const resp = await fetch('https://api.resend.com/emails', {
+        let resp = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${resendKey}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            from: FROM_EMAIL,
-            to: [r.email],
-            reply_to: REPLY_TO,
-            subject: personalSubject,
-            html,
-            headers: { 'List-Unsubscribe': `<${unsubUrl}>` },
-          }),
+          body: payload,
         });
+        if (resp.status === 429) {
+          await sleep(1200);
+          resp = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${resendKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: payload,
+          });
+        }
         if (resp.ok) {
           sent++;
         } else {
@@ -260,6 +277,57 @@ app.post('/api/send-promo', auth, async (req, res) => {
     return res.json({ ok: sent > 0 || recipients.length === 0, total: recipients.length, sent, failed, errors });
   } catch (err) {
     console.error('Promo email error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ── POST /api/send-broadcast ────────────────────────────────────
+// Body: { title, body, topic?, data? }
+app.post('/api/send-broadcast', auth, async (req, res) => {
+  try {
+    const { title, body, topic = 'offers', data = {} } = req.body || {};
+    if (!title) return res.status(400).json({ error: 'title is required' });
+
+    const usersSnap = await db.collection('users').get();
+    const tokens = [];
+    const uids = [];
+    for (const doc of usersSnap.docs) {
+      const u = doc.data() || {};
+      uids.push(doc.id);
+      if (u.fcmToken && String(u.fcmToken).trim().isNotEmpty !== false && String(u.fcmToken).trim().length > 10) {
+        tokens.push(String(u.fcmToken).trim());
+      }
+    }
+
+    const stringData = Object.fromEntries(
+      Object.entries({ topic, ...data }).map(([k, v]) => [k, String(v)])
+    );
+
+    let sent = 0;
+    let failed = 0;
+    for (let i = 0; i < tokens.length; i += 450) {
+      const chunk = tokens.slice(i, i + 450);
+      try {
+        const resp = await messaging.sendEachForMulticast({
+          tokens: chunk,
+          notification: { title: String(title), body: String(body || '') },
+          data: stringData,
+          android: {
+            priority: 'high',
+            notification: { channelId: 'high_importance_channel', priority: 'max', sound: 'default' },
+          },
+          apns: { payload: { aps: { alert: { title: String(title), body: String(body || '') }, sound: 'default', badge: 1 } } },
+        });
+        sent += resp.successCount;
+        failed += resp.failureCount;
+      } catch (e) {
+        failed += chunk.length;
+      }
+    }
+
+    return res.json({ ok: true, sent, failed, totalTokens: tokens.length, totalUsers: uids.length });
+  } catch (err) {
+    console.error('Broadcast error:', err);
     return res.status(500).json({ error: err.message });
   }
 });

@@ -28,6 +28,12 @@ function formatDateValue(val, fallback) {
   return String(val);
 }
 
+const formatQty = (q) => {
+  const n = Number(q || 1);
+  if (!Number.isFinite(n)) return '1';
+  return Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
+};
+
 function parseLineItems(order = {}) {
   const b = order.bookingData || {};
   const rawItems = order.countedItems || order.items || order.lines || b.selectedItems || {};
@@ -37,10 +43,10 @@ function parseLineItems(order = {}) {
   return list.map((it) => {
     const qty = Number(it.quantity || it.qty || 1);
     const unit = Number(it.unitPrice ?? it.numericPrice ?? String(it.price || 0).replace(/[^0-9.]/g, '')) || 0;
-    const lineTotal = Number(it.total ?? it.rowTotal ?? (unit * qty)) || 0;
+    const lineTotal = Number(it.total ?? it.rowTotal ?? (it.unitPrice != null ? unit * qty : String(it.price || 0).replace(/[^0-9.]/g, ''))) || (unit * qty);
     return {
       name: it.itemType || it.name || 'Garment',
-      quantity: qty,
+      quantity: formatQty(qty),
       price: money(lineTotal),
       totalNum: lineTotal,
     };
@@ -136,9 +142,11 @@ function buildDeliveredHtml(order = {}, id = '') {
   const items = parseLineItems(order);
   const itemsSum = items.reduce((sum, i) => sum + i.totalNum, 0);
   const subtotalNum = Number(order.subtotal ?? order.pricing?.subtotal ?? b.totalPrice ?? itemsSum) || 0;
+  const discountNum = Number(order.discountAmount ?? b.discountAmount ?? order.pricing?.discount ?? 0) || 0;
+  const loyaltyNum = Number(order.loyaltyCreditUsed ?? b.loyaltyCreditUsed ?? order.pricing?.loyaltyCredit ?? 0) || 0;
   const deliveryFeeNum = Number(order.deliveryFee ?? order.serviceFee ?? 0) || 0;
   const vatNum = Number(order.vatAmount ?? 0) || 0;
-  const totalNum = Number(order.transactionAmount ?? order.totalAmount ?? order.pricing?.final ?? (subtotalNum + deliveryFeeNum + vatNum)) || 0;
+  const totalNum = Number(order.transactionAmount ?? order.totalAmount ?? order.pricing?.final ?? Math.max(0, subtotalNum - discountNum - loyaltyNum + deliveryFeeNum + vatNum)) || 0;
 
   const subtotal = money(subtotalNum || totalNum);
   const deliveryFee = deliveryFeeNum === 0 ? 'Free' : money(deliveryFeeNum);
@@ -224,6 +232,8 @@ function buildDeliveredHtml(order = {}, id = '') {
             <td class="px" style="padding: 14px 40px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #6B7280;">Subtotal</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #111827;">${subtotal}</td></tr>
+                ${discountNum > 0 ? `<tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">Discount</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">-${money(discountNum)}</td></tr>` : ''}
+                ${loyaltyNum > 0 ? `<tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">Loyalty credit</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">-${money(loyaltyNum)}</td></tr>` : ''}
                 <tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #6B7280;">Delivery</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #111827;">${deliveryFee}</td></tr>
                 <tr><td align="left" style="padding: 4px 0 14px; font-size: 14px; color: #6B7280;">VAT</td><td align="right" style="padding: 4px 0 14px; font-size: 14px; color: #111827;">${vatAmount}</td></tr>
                 <tr>
@@ -268,9 +278,10 @@ function buildApprovalHtml(order = {}, id = '') {
   const items = parseLineItems(order);
   const itemsSum = items.reduce((sum, i) => sum + i.totalNum, 0);
   const subtotalNum = Number(order.subtotal ?? order.pricing?.subtotal ?? b.totalPrice ?? itemsSum) || 0;
-  const discountNum = Number(order.discountAmount ?? b.discountAmount ?? 0) || 0;
+  const discountNum = Number(order.discountAmount ?? b.discountAmount ?? order.pricing?.discount ?? 0) || 0;
+  const loyaltyNum = Number(order.loyaltyCreditUsed ?? b.loyaltyCreditUsed ?? order.pricing?.loyaltyCredit ?? 0) || 0;
   const serviceFeeNum = Number(order.serviceFee ?? order.deliveryFee ?? 0) || 0;
-  const totalNum = Number(order.transactionAmount ?? order.totalAmount ?? order.pricing?.final ?? (subtotalNum - discountNum + serviceFeeNum)) || 0;
+  const totalNum = Number(order.transactionAmount ?? order.totalAmount ?? order.pricing?.final ?? Math.max(0, subtotalNum - discountNum - loyaltyNum + serviceFeeNum)) || 0;
 
   const subtotal = money(subtotalNum);
   const serviceFee = serviceFeeNum === 0 ? 'Free' : money(serviceFeeNum);
@@ -351,6 +362,7 @@ function buildApprovalHtml(order = {}, id = '') {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #6B7280;">Subtotal</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #111827;">${subtotal}</td></tr>
                 ${discountNum > 0 ? `<tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">Discount</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">-${money(discountNum)}</td></tr>` : ''}
+                ${loyaltyNum > 0 ? `<tr><td align="left" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">Loyalty credit</td><td align="right" style="padding: 4px 0; font-size: 14px; color: #1A7F5A;">-${money(loyaltyNum)}</td></tr>` : ''}
                 <tr><td align="left" style="padding: 4px 0 14px; font-size: 14px; color: #6B7280;">Service &amp; delivery</td><td align="right" style="padding: 4px 0 14px; font-size: 14px; color: #111827;">${serviceFee}</td></tr>
                 <tr>
                   <td align="left" valign="middle" style="padding: 16px 0; border-top: 2px solid #0B2A6B; font-size: 15px; font-weight: bold; color: #111827;">Updated total</td>

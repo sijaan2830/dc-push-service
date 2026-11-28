@@ -111,6 +111,7 @@ function generateInvoicePdfBuffer(order = {}, idDisplay = '') {
           const name = it.itemType || it.name || 'Garment';
           const cat = it.category || 'Dry Clean';
           const qty = Number(it.quantity || it.qty || 1);
+          const qtyStr = Number.isInteger(qty) ? `${qty}` : `${Number(qty.toFixed(2))}`;
           const unit = Number(it.unitPrice ?? it.numericPrice ?? String(it.price || 0).replace(/[^0-9.]/g, '')) || 0;
           const rowTotal = Number(it.total ?? it.rowTotal ?? (unit * qty)) || 0;
           itemsSum += rowTotal;
@@ -119,7 +120,7 @@ function generateInvoicePdfBuffer(order = {}, idDisplay = '') {
             .text(`${idx + 1}`, 48, y, { width: 24 })
             .text(name, 74, y, { width: 170 })
             .fillColor('#6B7280').text(cat, 248, y, { width: 92 })
-            .fillColor('#111827').text(`${qty}`, 344, y, { width: 38, align: 'center' })
+            .fillColor('#111827').text(qtyStr, 344, y, { width: 38, align: 'center' })
             .text(money(unit), 386, y, { width: 76, align: 'right' })
             .font('Helvetica-Bold').text(money(rowTotal), 466, y, { width: 81, align: 'right' });
 
@@ -132,8 +133,9 @@ function generateInvoicePdfBuffer(order = {}, idDisplay = '') {
       // Totals & Payment
       const subtotalNum = Number(order.subtotal ?? order.pricing?.subtotal ?? b.totalPrice ?? itemsSum) || 0;
       const serviceFeeNum = Number(order.deliveryFee ?? order.serviceFee ?? 0) || 0;
-      const discountNum = Number(order.discountAmount ?? b.discountAmount ?? 0) || 0;
-      const totalNum = Number(order.transactionAmount ?? order.totalAmount ?? (subtotalNum - discountNum + serviceFeeNum)) || 0;
+      const discountNum = Number(order.discountAmount ?? b.discountAmount ?? order.pricing?.discount ?? 0) || 0;
+      const loyaltyCreditNum = Number(order.loyaltyCreditUsed ?? b.loyaltyCreditUsed ?? order.pricing?.loyaltyCredit ?? 0) || 0;
+      const totalNum = Number(order.transactionAmount ?? order.totalAmount ?? Math.max(0, subtotalNum - discountNum - loyaltyCreditNum + serviceFeeNum)) || 0;
 
       y += 12;
       doc.font('Helvetica').fontSize(9).fillColor('#6B7280').text('Payment', 48, y);
@@ -159,6 +161,12 @@ function generateInvoicePdfBuffer(order = {}, idDisplay = '') {
       if (discountNum > 0) {
         doc.fillColor('#1A7F5A').text('Discount', 328, sy, { width: 120 });
         doc.text(`-${money(discountNum)}`, 450, sy, { width: 97, align: 'right' });
+        sy += 18;
+      }
+
+      if (loyaltyCreditNum > 0) {
+        doc.fillColor('#1A7F5A').text('Loyalty credit', 328, sy, { width: 120 });
+        doc.text(`-${money(loyaltyCreditNum)}`, 450, sy, { width: 97, align: 'right' });
         sy += 18;
       }
 
