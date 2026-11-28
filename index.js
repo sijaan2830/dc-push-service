@@ -325,6 +325,43 @@ app.get('/api/resubscribe', async (req, res) => {
   }));
 });
 
+// ── Smart App Store / Google Play QR Redirect ────────────────────
+const IOS_APP_URL = 'https://apps.apple.com/app/id6797293315';
+const ANDROID_APP_URL = 'https://play.google.com/store/apps/details?id=com.drycleanplus.service.uk.app';
+const WEB_BOOKING_URL = 'https://drycleanplus.co.uk';
+
+function handleAppRedirect(req, res) {
+  const ua = String(req.headers['user-agent'] || '').toLowerCase();
+  if (/android/.test(ua)) {
+    return res.redirect(302, ANDROID_APP_URL);
+  }
+  if (/iphone|ipad|ipod/.test(ua)) {
+    return res.redirect(302, IOS_APP_URL);
+  }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.send(`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+  <title>Get the DryClean Plus App</title></head>
+  <body style="margin:0;padding:32px 16px;background:#F5F7FA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#111827;">
+    <div style="max-width:440px;margin:32px auto;background:#FFFFFF;border-radius:16px;border:1px solid #E5E7EB;padding:32px 24px;text-align:center;box-shadow:0 8px 24px rgba(11,42,107,0.08);">
+      <div style="margin-bottom:18px;">
+        <span style="font-family:'Satisfy',cursive,Georgia,serif;font-size:30px;font-weight:bold;font-style:italic;color:#1B5E20;">Dryclean</span>
+        <span style="font-family:'Satisfy',cursive,Georgia,serif;font-size:30px;font-weight:bold;font-style:italic;color:#EF4444;margin-left:3px;">Plus+</span>
+      </div>
+      <h2 style="margin:0 0 8px;font-size:22px;color:#0B2A6B;">Download the DryClean Plus App</h2>
+      <p style="margin:0 0 24px;font-size:14.5px;line-height:1.55;color:#4B5563;">Free doorstep collection &amp; delivery · Pay on delivery</p>
+      <a href="${IOS_APP_URL}" style="display:block;margin:0 auto 12px;max-width:260px;padding:13px 20px;background:#000000;color:#FFFFFF;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700;">Download on App Store (iPhone)</a>
+      <a href="${ANDROID_APP_URL}" style="display:block;margin:0 auto 16px;max-width:260px;padding:13px 20px;background:#0B2A6B;color:#FFFFFF;text-decoration:none;border-radius:10px;font-size:15px;font-weight:700;">Get it on Google Play (Android)</a>
+      <div style="padding-top:12px;border-top:1px solid #E5E7EB;">
+        <a href="${WEB_BOOKING_URL}" style="font-size:14px;font-weight:600;color:#0077FF;text-decoration:underline;">Or book online at drycleanplus.co.uk</a>
+      </div>
+    </div>
+  </body></html>`);
+}
+
+app.get('/app', handleAppRedirect);
+app.get('/download', handleAppRedirect);
+
 // ── Health ───────────────────────────────────────────────────────
 app.get('/health', (_req, res) => res.json({ ok: true }));
 app.get('/', (_req, res) => res.send('DryClean Plus Push Service'));
